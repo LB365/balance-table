@@ -1,0 +1,89 @@
+<html>
+
+<head>
+  <style>
+    table {
+      text-align: center;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-bottom: 1px solid black;
+      border-top: 1px solid black;
+    }
+
+    .data {
+      font-family: Calibri;
+      width: 80px;
+      color: black;
+      text-align: center !important;
+    }
+
+    thead th {
+      background: #0062AD;
+      font-family: monospace;
+      color: white;
+      text-align: center !important;
+      border-right: 1px solid black;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: whitesmoke;
+    }
+    thead tr th:nth-child(1) {
+      position: sticky;
+      font-family: Calibri;
+      color: whitesmoke;
+      left: 0px;
+      z-index: 3 !important;
+      background-color: white;
+    }
+
+    tbody tr th:nth-child(1) {
+      position: sticky;
+      width: 100px;
+      font-family: Calibri;
+      color: black;
+      left: 0px;
+      z-index: 1;
+      text-align: left !important;
+    }
+
+    thead tr:nth-child(1) th {
+      position: sticky;
+      font-family: Calibri;
+      color: whitesmoke;
+      top: 0px;
+      z-index: 2;
+    }
+
+  </style>
+</head>
+
+<body>
+  <style>
+  </style>
+  <div id="table">
+    {{ table | safe }}
+  </div>
+</body>
+<script>
+    var dims = JSON.parse('{{ dims | tojson | safe }}');
+    var hierarchy = JSON.parse('{{ hierarchy | tojson | safe }}');
+    var rows = [...document.querySelectorAll("tr")]
+    Object.keys(hierarchy).forEach(key => {
+      Array.from(document.getElementsByClassName(key)).forEach(e => e.addEventListener("click", function () {
+      console.log(e)
+      for (var i = 0; i < dims[0]; i++) {
+        if (hierarchy[key].includes(i)) {
+          if (rows[i + 1].style.visibility == 'collapse') {
+            rows[i + 1].style.visibility = ''
+          } else {
+            rows[i + 1].style.visibility = 'collapse'
+          }
+        } else {
+        }
+      }      
+    }));
+    });
+</script>
+
+</html>

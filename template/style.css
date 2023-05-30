@@ -1,0 +1,32 @@
+.thead tr th:nth-child(1) {
+    position: sticky;
+    background-color: inherit;
+    left: 0px;
+    z-index: 3 !important;
+}
+
+.tbody tr th:nth-child(1) {
+    position: sticky;
+    left: 0px;
+    z-index: 1;
+}
+
+.thead tr:nth-child(1) th {
+    position: sticky;
+    top: 0px;
+    z-index: 2;
+}
+
+.td:hover {
+    background-color: #FFFFE0;
+}
+
+.index_name {
+    background-color: #800000;
+}
+
+th:not(.index_name) {
+    background-color: #800000;
+    color: black;
+    text-align: center;
+}

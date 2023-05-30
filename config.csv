@@ -1,0 +1,8 @@
+table_id,table_start,table_end,freq,series_id,label,level,parent,last_series,precision,parent_agg,freq_agg
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_1,North America,0,,series_1,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_2,USA,1,series_1,series_2,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_3,Texas,2,series_2,series_2,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_4,Dakota,2,series_2,series_2,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_5,Latin America,0,,series_2,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_6,Brazil,1,series_5,series_2,1,sum,mean
+table_id_1,"(date ""2022-1-1"")","(date ""2024-1-1"")",Q,series_7,Argentina,1,series_5,series_2,1,sum,mean
