@@ -15,18 +15,27 @@ PRETTY_DATES = {
     'Q': 'Q%q-%y',
     'A': '%Y',
 }
-series_name = [f'series_{x}' for x in range(1, 8)]
+series_name = [f'series_{x}' for x in range(1, 9)]
 data = (pd.DataFrame(
     np.random.randn(300, len(series_name)), 
     columns=series_name,
     index=WEEKLY_DATE
 ) * 100)
+data['series_2'] = data['series_2'].fillna(0)
+data = data.assign(
+    series_2=lambda x: np.where(
+        x.index < pd.Timestamp.now(), x['series_2'], np.nan)
+    )
 CONFIG = pd.read_csv('config.csv').set_index(
     ['table_id', 'table_start', 'table_end', 'freq']
     )
 today = {
     True: 'today',
     False: '',
+}
+df_today = {
+    True: 'true',
+    False: 'false',
 }
 cell_hover = {
     "selector": "tr:hover",
@@ -41,16 +50,15 @@ today_css = {
     'border-right': '1px solid black'
 }
 level_0_css = {
-    "background-color": '#004275',
-    'font-weight': 'bold',
-    'color': 'white',
+    "background-color": 'white',
+    'color': 'black',
     'border-bottom': '1pt solid black',
     'border-top': '1pt solid black',
 }
 level_2_css = {
     'font-size':'small',
 }
-css_level_0 = "background-color:#004275;border-bottom:1pt solid black;border-top:1pt solid black;color:white"
+css_level_0 = "background-color:white;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
 css_level_1 = 'text-indent:10%;font-size:smaller;'
 css_level_2 = 'text-indent:20%;font-size:x-small;'
 
@@ -72,17 +80,31 @@ def _extract_by_series_id(config, dim, key='series_id'):
 def _extract_by_series_id_series(config, dim, key='series_id'):
     return config[[key, dim]].set_index(key)[dim]
 
+def define_predicted_cells(data, config):
+    predicted_data = data.copy()
+    predicted = _extract_by_series_id(config, 'last_series')
+    for series in data:
+        predicted_data[series] = pd.isna(data[predicted[series]]).map(df_today)
+    return predicted_data
+
+def _reshape_balance(data, config, freq):
+    data.index = data.index.strftime(PRETTY_DATES[freq])
+    pretty_names = _extract_by_series_id(config, 'label', 'series_id')
+    data = data.rename(columns=pretty_names)[list(pretty_names.values())]
+    data = data.T
+    return data
+
 def reshape_to_balance_table(data, config, start, end, freq, today=None):
     today = today or pd.Timestamp.now()
     start, end = evaluate_not_none(start), evaluate_not_none(end)
     aggs = _extract_by_series_id(config, 'freq_agg')
     data = data[start:end].resample(freq).agg(aggs)
     data.index = data.index.to_period()
+    predicted = _reshape_balance(
+        define_predicted_cells(data, config),
+        config,
+        freq,
+    )
     is_today = (data.index.start_time < today) & (today < data.index.end_time)
-    data.index = data.index.strftime(PRETTY_DATES[freq])
-    pretty_names = _extract_by_series_id(config, 'label', 'series_id')
-    data = data.rename(columns=pretty_names)[list(pretty_names.values())]
-    data = data.T
-    for col in data.columns:
-        data.loc[data.sample(frac=0.1).index, col] = np.nan
-    return data, config, is_today
+    data = _reshape_balance(data, config, freq)
+    return data, config, is_today, predicted

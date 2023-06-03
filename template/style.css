@@ -22,7 +22,7 @@
 }
 
 .index_name {
-    background-color: #800000;
+    background-color: lightblue;
 }
 
 th:not(.index_name) {

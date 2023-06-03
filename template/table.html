@@ -18,20 +18,19 @@
     }
 
     thead th {
-      background: #0062AD;
-      font-family: monospace;
-      color: white;
+      background: lightblue;
+      font-family: Calibri;
+      color: black;
       text-align: center !important;
-      border-right: 1px solid black;
     }
 
-    tbody tr:nth-child(even) {
+    /* tbody tr:nth-child(even) {
       background-color: whitesmoke;
-    }
+    } */
     thead tr th:nth-child(1) {
       position: sticky;
       font-family: Calibri;
-      color: whitesmoke;
+      color: black;
       left: 0px;
       z-index: 3 !important;
       background-color: white;
@@ -50,7 +49,7 @@
     thead tr:nth-child(1) th {
       position: sticky;
       font-family: Calibri;
-      color: whitesmoke;
+      color: black;
       top: 0px;
       z-index: 2;
     }
@@ -71,7 +70,6 @@
     var rows = [...document.querySelectorAll("tr")]
     Object.keys(hierarchy).forEach(key => {
       Array.from(document.getElementsByClassName(key)).forEach(e => e.addEventListener("click", function () {
-      console.log(e)
       for (var i = 0; i < dims[0]; i++) {
         if (hierarchy[key].includes(i)) {
           if (rows[i + 1].style.visibility == 'collapse') {

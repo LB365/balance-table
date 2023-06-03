@@ -31,7 +31,7 @@ def format_row_wise(styler, formatter):
 
 @balance_table.route('/table/<table_id>/<freq>/<start>/<end>')
 def table_to_html(table_id, freq, start, end):
-    frame, _config, is_today = reshape_to_balance_table(
+    frame, _config, is_today, predicted = reshape_to_balance_table(
         balance_table.data, 
         balance_table.CONFIG.xs(table_id), 
         start, 
@@ -57,6 +57,11 @@ def table_to_html(table_id, freq, start, end):
     _level_2 = levels[levels == 2].index
     level_0 = idx[idx[_level_0], idx[style.columns]]
     level_2 = idx[idx[_level_2], idx[style.columns]]
+    style.set_table_styles([  # create internal CSS classes
+    {'selector': '.true', 'props': 'background-color: lightyellow;'},
+    {'selector': '.false', 'props': 'background-color: #ffffff;'},
+    ], overwrite=False)
+    style.set_td_classes(predicted)
     style.set_properties(**level_0_css, subset=level_0, axis=1)
     style.set_properties(**level_2_css, subset=level_2, axis=1)
     style.applymap_index(lambda v: css_level_0 if v in _level_0 else None, axis=0)
