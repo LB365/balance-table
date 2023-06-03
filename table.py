@@ -1,10 +1,7 @@
-import numpy as np
-import pandas as pd
 import pandas as pd
 from moment import evaluate_not_none
 from dep_graph import find_dep_graph
-N_OBS = 1000
-WEEKLY_DATE = pd.date_range('2018', freq='W-FRI',periods=N_OBS)
+
 PRETTY_DATES = {
     'MS': '%b-%y',
     'W-FRI': '%d-%b',
@@ -12,18 +9,7 @@ PRETTY_DATES = {
     'Q': 'Q%q-%y',
     'A': '%Y',
 }
-series_name = [f'series_{x}' for x in range(1, 9)]
-data = (pd.DataFrame(
-    np.random.randn(N_OBS, len(series_name)), 
-    columns=series_name,
-    index=WEEKLY_DATE
-) * 100)
-data['series_3'] = data['series_3'].fillna(0)
-data = data.assign(
-    series_3=lambda x: np.where(
-        x.index < pd.Timestamp.now(), x['series_3'], np.nan)
-    )
-CONFIG = pd.read_csv('config.csv').set_index('table_id')
+
 today = {
     True: 'today',
     False: '',
@@ -103,7 +89,6 @@ def reshape_to_balance_table(data, config, start, end, freq, today=None):
     today = today or pd.Timestamp.now()
     start, end = evaluate_not_none(start), evaluate_not_none(end)
     data = compute_nodes(data, config)
-    print(data)
     aggs = _extract_by_series_id(config, 'freq_agg')
     data = data.resample(freq).agg(aggs)
     data.index = data.index.to_period()

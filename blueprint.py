@@ -1,8 +1,6 @@
-import numpy as np
 import pandas as pd
-from flask import Flask, render_template, Blueprint
+from flask import render_template, Blueprint
 import pandas as pd
-from pathlib import Path
 from table import (
     _extract_by_series_id,
     _extract_by_series_id_series,
@@ -16,8 +14,6 @@ from table import (
     level_2_css,
     today_css,
     pandas_dep_graph,
-    CONFIG,
-    data,
 )
 
 balance_table = Blueprint('table', __name__, template_folder='template')
@@ -67,9 +63,10 @@ def table_to_html(table_id, freq, start, end):
     style.applymap_index(lambda v: css_level_0 if v in _level_0 else None, axis=0)
     style.applymap_index(lambda v: css_level_1 if v in _level_1 else None, axis=0)
     style.applymap_index(lambda v: css_level_2 if v in _level_2 else None, axis=0)
-    def color_b(s):
-        return "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black" if s == frame.columns[is_today] else None
-    style.applymap_index(color_b, axis=1)
+    def color_current(s):
+        current = "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black"
+        return current if s == frame.columns[is_today] else None
+    style.applymap_index(color_current, axis=1)
     styled = style.to_html()
     # Define the hierarchy graph for user interation 
     hierarchy = pandas_dep_graph(_config)
@@ -78,11 +75,4 @@ def table_to_html(table_id, freq, start, end):
         table=styled,
         hierarchy=hierarchy,
         dims = frame.shape,
-        ) 
-
-if __name__ == '__main__':
-    balance_table.CONFIG = CONFIG
-    balance_table.data = data
-    app = Flask(__name__, template_folder='template')
-    app.register_blueprint(balance_table)
-    app.run(host='localhost', debug=True, port=8080)
+        )
