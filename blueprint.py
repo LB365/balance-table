@@ -58,7 +58,7 @@ def table_to_html(table_id, freq, start, end):
     level_0 = idx[idx[_level_0], idx[style.columns]]
     level_2 = idx[idx[_level_2], idx[style.columns]]
     style.set_table_styles([  # create internal CSS classes
-    {'selector': '.true', 'props': 'background-color: lightyellow;'},
+    {'selector': '.true', 'props': 'background-color: #ffffbc;'},
     {'selector': '.false', 'props': 'background-color: #ffffff;'},
     ], overwrite=False)
     style.set_td_classes(predicted)
@@ -67,6 +67,9 @@ def table_to_html(table_id, freq, start, end):
     style.applymap_index(lambda v: css_level_0 if v in _level_0 else None, axis=0)
     style.applymap_index(lambda v: css_level_1 if v in _level_1 else None, axis=0)
     style.applymap_index(lambda v: css_level_2 if v in _level_2 else None, axis=0)
+    def color_b(s):
+        return "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black" if s == frame.columns[is_today] else None
+    style.applymap_index(color_b, axis=1)
     styled = style.to_html()
     # Define the hierarchy graph for user interation 
     hierarchy = pandas_dep_graph(_config)

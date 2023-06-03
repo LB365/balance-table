@@ -22,11 +22,11 @@
 }
 
 .index_name {
-    background-color: lightblue;
+    background-color: gainsboro;
 }
 
 th:not(.index_name) {
-    background-color: #800000;
+    background-color: lightyellow;
     color: black;
     text-align: center;
 }

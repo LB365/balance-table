@@ -3,11 +3,8 @@ import pandas as pd
 import pandas as pd
 from moment import evaluate_not_none
 from dep_graph import find_dep_graph
-
-WEEKLY_DATE = pd.date_range('2018', freq='W-FRI',periods=300)
-MONTHLY_DATE = pd.date_range('2018', freq='MS',periods=30)
-DAILY_DATE = pd.date_range('2018', freq='D',periods=30)
-
+N_OBS = 1000
+WEEKLY_DATE = pd.date_range('2018', freq='W-FRI',periods=N_OBS)
 PRETTY_DATES = {
     'MS': '%b-%y',
     'W-FRI': '%d-%b',
@@ -17,18 +14,16 @@ PRETTY_DATES = {
 }
 series_name = [f'series_{x}' for x in range(1, 9)]
 data = (pd.DataFrame(
-    np.random.randn(300, len(series_name)), 
+    np.random.randn(N_OBS, len(series_name)), 
     columns=series_name,
     index=WEEKLY_DATE
 ) * 100)
-data['series_2'] = data['series_2'].fillna(0)
+data['series_3'] = data['series_3'].fillna(0)
 data = data.assign(
-    series_2=lambda x: np.where(
-        x.index < pd.Timestamp.now(), x['series_2'], np.nan)
+    series_3=lambda x: np.where(
+        x.index < pd.Timestamp.now(), x['series_3'], np.nan)
     )
-CONFIG = pd.read_csv('config.csv').set_index(
-    ['table_id', 'table_start', 'table_end', 'freq']
-    )
+CONFIG = pd.read_csv('config.csv').set_index('table_id')
 today = {
     True: 'today',
     False: '',
@@ -50,7 +45,6 @@ today_css = {
     'border-right': '1px solid black'
 }
 level_0_css = {
-    "background-color": 'white',
     'color': 'black',
     'border-bottom': '1pt solid black',
     'border-top': '1pt solid black',
@@ -58,7 +52,7 @@ level_0_css = {
 level_2_css = {
     'font-size':'small',
 }
-css_level_0 = "background-color:white;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
+css_level_0 = "background-color:#ecebea;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
 css_level_1 = 'text-indent:10%;font-size:smaller;'
 css_level_2 = 'text-indent:20%;font-size:x-small;'
 
@@ -94,12 +88,26 @@ def _reshape_balance(data, config, freq):
     data = data.T
     return data
 
+def compute_nodes(data, config):
+    _series = [
+        x for x in config.sort_values('level', ascending=False)['series_id']
+        if x not in data.columns
+    ]
+    for parent in _series:
+        child_series = config[config.parent == parent]['series_id'].values
+        agg_operation = config[config.series_id == parent]['parent_agg'].values[0]
+        data[parent] = data[child_series].agg(agg_operation, axis=1)
+    return data
+
 def reshape_to_balance_table(data, config, start, end, freq, today=None):
     today = today or pd.Timestamp.now()
     start, end = evaluate_not_none(start), evaluate_not_none(end)
+    data = compute_nodes(data, config)
+    print(data)
     aggs = _extract_by_series_id(config, 'freq_agg')
-    data = data[start:end].resample(freq).agg(aggs)
+    data = data.resample(freq).agg(aggs)
     data.index = data.index.to_period()
+    data = data[(data.index.start_time >= start) & (data.index.end_time <= end)]
     predicted = _reshape_balance(
         define_predicted_cells(data, config),
         config,
