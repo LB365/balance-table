@@ -1,6 +1,3 @@
-from typing import List, Dict
-
-
 def find_parents(x, input_data):
     res = []
     new = input_data[x]

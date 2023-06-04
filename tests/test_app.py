@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from blueprint import balance_table
+from balance_table.blueprint import balance_table
 from flask import Flask
 
 N_OBS = 1000

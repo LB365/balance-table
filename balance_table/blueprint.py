@@ -5,14 +5,14 @@ from table import (
     _extract_by_series_id,
     _extract_by_series_id_series,
     reshape_to_balance_table,
-    cell_hover,
-    cell_hover_2,
-    css_level_0,
-    css_level_1,
-    css_level_2,
-    level_0_css,
-    level_2_css,
-    today_css,
+    CELL_HOVER,
+    CELL_HOVER_2,
+    CSS_LEVEL_0,
+    CSS_LEVEL_1,
+    CSS_LEVEL_2,
+    LEVEL_0_CSS,
+    LEVEL_2_CSS,
+    TODAY_CSS,
     pandas_dep_graph,
 )
 
@@ -36,10 +36,10 @@ def _table_to_html(config, frame, is_today, predicted):
         for k, v in precision.items()
     }
     style = format_row_wise(frame.style, fn_precision).set_table_styles(
-        [cell_hover, cell_hover_2]
+        [CELL_HOVER, CELL_HOVER_2]
     )
     # Today is highlighted
-    style.set_properties(**today_css, subset=style.columns[is_today])
+    style.set_properties(**TODAY_CSS, subset=style.columns[is_today])
     # Define hierchical style
     idx = pd.IndexSlice
     _level_0 = levels[levels == 0].index
@@ -52,17 +52,18 @@ def _table_to_html(config, frame, is_today, predicted):
         {'selector': '.false', 'props': 'background-color: #ffffff;'},
     ], overwrite=False)
     style.set_td_classes(predicted)
-    style.set_properties(**level_0_css, subset=level_0, axis=1)
-    style.set_properties(**level_2_css, subset=level_2, axis=1)
+    style.set_properties(**LEVEL_0_CSS, subset=level_0, axis=1)
+    style.set_properties(**LEVEL_2_CSS, subset=level_2, axis=1)
     style.applymap_index(
-        lambda v: css_level_0 if v in _level_0 else None, axis=0)
+        lambda v: CSS_LEVEL_0 if v in _level_0 else None, axis=0)
     style.applymap_index(
-        lambda v: css_level_1 if v in _level_1 else None, axis=0)
+        lambda v: CSS_LEVEL_1 if v in _level_1 else None, axis=0)
     style.applymap_index(
-        lambda v: css_level_2 if v in _level_2 else None, axis=0)
+        lambda v: CSS_LEVEL_2 if v in _level_2 else None, axis=0)
 
     def color_current(s):
-        current = "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black"
+        current = "background-color: #add8e6;border-left:1pt solid black"
+        ";border-right:1pt solid black"
         return current if s == frame.columns[is_today] else None
     style.applymap_index(color_current, axis=1)
     return style

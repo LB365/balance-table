@@ -10,37 +10,37 @@ PRETTY_DATES = {
     'A': '%Y',
 }
 
-today = {
+TODAY = {
     True: 'today',
     False: '',
 }
-df_today = {
+DF_TODAY = {
     True: 'true',
     False: 'false',
 }
-cell_hover = {
+CELL_HOVER = {
     "selector": "tr:hover",
     "props": [("background-color", "#FFFFE0")]
 }
-cell_hover_2 = {
+CELL_HOVER_2 = {
     "selector": "td:hover",
     "props": [("background-color", "#858536")]
 }
-today_css = {
+TODAY_CSS = {
     'border-left': '1px solid black',
     'border-right': '1px solid black'
 }
-level_0_css = {
+LEVEL_0_CSS = {
     'color': 'black',
     'border-bottom': '1pt solid black',
     'border-top': '1pt solid black',
 }
-level_2_css = {
+LEVEL_2_CSS = {
     'font-size': 'small',
 }
-css_level_0 = "background-color:#ecebea;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
-css_level_1 = 'text-indent:10%;font-size:smaller;'
-css_level_2 = 'text-indent:20%;font-size:x-small;'
+CSS_LEVEL_0 = "background-color:#ecebea;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
+CSS_LEVEL_1 = 'text-indent:10%;font-size:smaller;'
+CSS_LEVEL_2 = 'text-indent:20%;font-size:x-small;'
 
 
 def pandas_dep_graph(config):
@@ -69,7 +69,7 @@ def define_predicted_cells(data, config):
     predicted_data = data.copy()
     predicted = _extract_by_series_id(config, 'last_series')
     for series in data:
-        predicted_data[series] = pd.isna(data[predicted[series]]).map(df_today)
+        predicted_data[series] = pd.isna(data[predicted[series]]).map(DF_TODAY)
     return predicted_data
 
 
