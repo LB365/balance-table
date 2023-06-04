@@ -23,6 +23,7 @@
       color: black;
       text-align: center !important;
     }
+
     .blank.level0 {
       border-right: 1px solid black;
     }
@@ -33,7 +34,6 @@
       color: black;
       left: 0px;
       z-index: 3 !important;
-      background-color: white;
     }
 
     tbody tr th:nth-child(1) {
@@ -54,7 +54,6 @@
       top: 0px;
       z-index: 2;
     }
-
   </style>
 </head>
 
@@ -66,11 +65,11 @@
   </div>
 </body>
 <script>
-    var dims = JSON.parse('{{ dims | tojson | safe }}');
-    var hierarchy = JSON.parse('{{ hierarchy | tojson | safe }}');
-    var rows = [...document.querySelectorAll("tr")]
-    Object.keys(hierarchy).forEach(key => {
-      Array.from(document.getElementsByClassName(key)).forEach(e => e.addEventListener("click", function () {
+  var dims = JSON.parse('{{ dims | tojson | safe }}');
+  var hierarchy = JSON.parse('{{ hierarchy | tojson | safe }}');
+  var rows = [...document.querySelectorAll("tr")]
+  Object.keys(hierarchy).forEach(key => {
+    Array.from(document.getElementsByClassName(key)).forEach(e => e.addEventListener("click", function () {
       for (var i = 0; i < dims[0]; i++) {
         if (hierarchy[key].includes(i)) {
           if (rows[i + 1].style.visibility == 'collapse') {
@@ -80,9 +79,9 @@
           }
         } else {
         }
-      }      
+      }
     }));
-    });
+  });
 </script>
 
 </html>

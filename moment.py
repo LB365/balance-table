@@ -31,11 +31,14 @@ def date_to_datetime(dat):
     else:
         return datetime(dat.year, dat.month, dat.day)
 
+
 def datenow():
     return date_to_datetime(datetime.now())
 
+
 def datetoday():
     return date_to_datetime(datetime.now().date())
+
 
 ENV = Env({
     'now': datenow,
