@@ -1,9 +1,9 @@
-table_id,series_id,label,level,parent,last_series,precision,parent_agg,freq_agg,tol_diff
-table_id_1,series_x,North America,0,,series_3,0,sum,mean,1.2
-table_id_1,series_y,USA,1,series_x,series_3,0,sum,mean,1.2
-table_id_1,series_3,Texas,2,series_y,series_3,0,,mean,1.2
-table_id_1,series_4,Dakota,2,series_y,series_3,0,,mean,1.2
-table_id_1,series_5,Latin America,0,,series_3,0,,mean,1.2
-table_id_1,series_6,Brazil,1,series_5,series_3,0,,mean,1.2
-table_id_1,series_7,Argentina,1,series_5,series_3,0,,mean,1.2
-table_id_1,series_8,Buenos Aires,2,series_7,series_3,0,,mean,1.2
+table_id,series_id,label,level,parent,last_series,precision,parent_agg,freq_agg,tol_diff,parent_coeff
+table_id_1,series_x,North America,0,,series_3,0,sum,mean,1.2,1
+table_id_1,series_y,USA,1,series_x,series_3,0,sum,mean,1.2,1
+table_id_1,series_3,Texas,2,series_y,series_3,0,,mean,1.2,1
+table_id_1,series_4,Dakota,2,series_y,series_3,0,,mean,1.2,1
+table_id_1,series_5,Latin America,0,,series_3,0,,mean,1.2,1
+table_id_1,series_6,Brazil,1,series_5,series_3,0,,mean,1.2,1
+table_id_1,series_7,Argentina,1,series_5,series_3,0,,mean,1.2,1
+table_id_1,series_8,Buenos Aires,2,series_7,series_3,0,,mean,1.2,1

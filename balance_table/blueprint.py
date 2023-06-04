@@ -1,7 +1,7 @@
 import pandas as pd
 from flask import render_template, Blueprint
 import pandas as pd
-from table import (
+from balance_table.table import (
     _extract_by_series_id,
     _extract_by_series_id_series,
     reshape_to_balance_table,
@@ -62,8 +62,7 @@ def _table_to_html(config, frame, is_today, predicted):
         lambda v: CSS_LEVEL_2 if v in _level_2 else None, axis=0)
 
     def color_current(s):
-        current = "background-color: #add8e6;border-left:1pt solid black"
-        ";border-right:1pt solid black"
+        current = "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black"
         return current if s == frame.columns[is_today] else None
     style.applymap_index(color_current, axis=1)
     return style

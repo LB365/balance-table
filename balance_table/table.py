@@ -1,6 +1,6 @@
 import pandas as pd
-from moment import evaluate_not_none
-from dep_graph import find_dep_graph
+from balance_table.moment import evaluate_not_none
+from balance_table.dep_graph import find_dep_graph
 
 PRETTY_DATES = {
     'MS': '%b-%y',
@@ -39,8 +39,8 @@ LEVEL_2_CSS = {
     'font-size': 'small',
 }
 CSS_LEVEL_0 = "background-color:#ecebea;border-bottom:1pt solid black;border-top:1pt solid black;color:black"
-CSS_LEVEL_1 = 'text-indent:10%;font-size:smaller;'
-CSS_LEVEL_2 = 'text-indent:20%;font-size:x-small;'
+CSS_LEVEL_1 = 'background-color:white;text-indent:10%;font-size:smaller;'
+CSS_LEVEL_2 = 'background-color:white;text-indent:20%;font-size:x-small;'
 
 
 def pandas_dep_graph(config):
@@ -82,10 +82,14 @@ def _reshape_balance(data, config, freq):
 
 
 def compute_nodes(data, config):
+    coefs = _extract_by_series_id(config, 'parent_coeff', 'series_id')
     _series = [
         x for x in config.sort_values('level', ascending=False)['series_id']
         if x not in data.columns
     ]
+    for s in data:
+        if s in coefs:
+            data[s] *= coefs[s] 
     for parent in _series:
         child_series = config[config.parent == parent]['series_id'].values
         agg_operation = config[config.series_id ==
