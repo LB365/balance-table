@@ -68,13 +68,16 @@
 <script>
   var dims = JSON.parse('{{ dims | tojson | safe }}');
   var hierarchy = JSON.parse('{{ hierarchy | tojson | safe }}');
+  var parents = JSON.parse('{{ parents | tojson | safe }}');
   var rows = [...document.querySelectorAll("tr")]
   Object.keys(hierarchy).forEach(key => {
     Array.from(document.getElementsByClassName(key)).forEach(e => e.addEventListener("click", function () {
       for (var i = 0; i < dims[0]; i++) {
         if (hierarchy[key].includes(i)) {
           if (rows[i + 1].style.visibility == 'collapse') {
-            rows[i + 1].style.visibility = ''
+            if (parents[i].includes(key)){
+              rows[i + 1].style.visibility = ''
+            }
           } else {
             rows[i + 1].style.visibility = 'collapse'
           }

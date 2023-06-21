@@ -14,6 +14,7 @@ from balance_table.table import (
     LEVEL_2_CSS,
     TODAY_CSS,
     pandas_dep_graph,
+    pandas_parent_graph,
 )
 
 balance_table = Blueprint('table', __name__, template_folder='template')
@@ -81,10 +82,12 @@ def table_to_html(table_id, freq, start, end):
     styled = style.to_html()
     # Define the hierarchy graph for user interation
     hierarchy = pandas_dep_graph(config)
+    parents = pandas_parent_graph(config)
     return render_template(
         "table.html",
         table=styled,
         hierarchy=hierarchy,
+        parents=parents,
         dims=frame.shape,
     )
 
@@ -103,9 +106,11 @@ def dtable_to_html(table_id, freq, start, end):
     styled = style.to_html()
     # Define the hierarchy graph for user interation
     hierarchy = pandas_dep_graph(config)
+    parents = pandas_parent_graph(config)
     return render_template(
         "table.html",
         table=styled,
         hierarchy=hierarchy,
+        parents=parents,
         dims=frame.shape,
     )

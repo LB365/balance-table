@@ -21,15 +21,3 @@ def find_dep_graph(dependency_graph):
                 if x == parent:
                     output_childrens[x].append(child)
     return dict(filter(lambda v: v[1], output_childrens.items()))
-
-
-if __name__ == '__main__':
-    dependency_graph = {
-        '1': [],
-        '2': ['1'],
-        '3': ['2'],
-        '4': ['1'],
-    }
-    expected = {'1': ['2', '3', '4'], '2': ['3']}
-    result = find_dep_graph(dependency_graph)
-    assert result == expected

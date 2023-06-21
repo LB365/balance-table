@@ -56,6 +56,30 @@ def pandas_dep_graph(config):
     }
     return deps
 
+def pandas_parent_graph(config):
+    _config = config.reset_index().reset_index()
+    dependants = _extract_by_series_id(_config, 'parent', 'series_id')
+    rows = _extract_by_series_id(_config, 'index', 'series_id')
+    parents = {k: [v] if not pd.isna(
+        v) else [] for k, v in dependants.items()}
+    pars = {
+        rows[k]: [f'row{rows[v2]}' for v2 in v]
+        for k, v in parents.items()
+    }
+    return pars
+
+def pandas_dep_graph(config):
+    _config = config.reset_index().reset_index()
+    dependants = _extract_by_series_id(_config, 'parent', 'series_id')
+    rows = _extract_by_series_id(_config, 'index', 'series_id')
+    clean_dependants = {k: [v] if not pd.isna(
+        v) else [] for k, v in dependants.items()}
+    graph = find_dep_graph(clean_dependants)
+    deps = {
+        f'row{rows[k]}': [rows[v2] for v2 in v]
+        for k, v in graph.items()
+    }
+    return deps
 
 def _extract_by_series_id(config, dim, key='series_id'):
     return config[[key, dim]].set_index(key)[dim].to_dict()
