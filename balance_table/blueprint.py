@@ -1,7 +1,7 @@
-import pandas as pd
 from flask import render_template, Blueprint
 import pandas as pd
-from balance_table.table import (
+import numpy as np
+from balances.table import (
     _extract_by_series_id,
     _extract_by_series_id_series,
     reshape_to_balance_table,
@@ -17,6 +17,16 @@ from balance_table.table import (
     pandas_parent_graph,
 )
 
+import jinja2
+from viz.graphs.balances import TEMPLATE_LOCATION
+
+
+def render_jinja_html(file_name, **context):
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(TEMPLATE_LOCATION) + '/template')
+    ).get_template(file_name).render(context)
+
+
 balance_table = Blueprint('table', __name__, template_folder='template')
 
 
@@ -28,12 +38,15 @@ def format_row_wise(styler, formatter):
     return styler
 
 
-def _table_to_html(config, frame, is_today, predicted):
+def __table_to_html(
+    config, frame, is_today, predicted, diff_mode):
     levels = _extract_by_series_id_series(config, 'level', 'label')
     precision = _extract_by_series_id(config, 'precision', 'label')
+    tol_diff = _extract_by_series_id(config, 'tol_diff', 'label')
+
     # Define precision and hovering per cell
     fn_precision = {
-        k: lambda x: f"{x:0.{v}f}" if not pd.isna(x) else "-"
+        k: lambda x: f"{x:,.{v}f}" if not pd.isna(x) else "-"
         for k, v in precision.items()
     }
     style = format_row_wise(frame.style, fn_precision).set_table_styles(
@@ -65,52 +78,86 @@ def _table_to_html(config, frame, is_today, predicted):
     def color_current(s):
         current = "background-color: #add8e6;border-left:1pt solid black;border-right:1pt solid black"
         return current if s == frame.columns[is_today] else None
+
     style.applymap_index(color_current, axis=1)
+
+    def diff_colors(series):
+        colors ={
+            -1: "color:rgba(220, 20, 60, 1);",
+             0: "color:rgba(0, 0, 0, 0.0);",
+             1: "color:rgba(34, 139, 34, 1);",
+        }
+        tolerance = tol_diff[series.name]
+        print(series.name, tolerance)
+        greater = (series > tolerance)
+        lower = (series < - tolerance)
+        indicator = np.where(greater, 1, 0) - np.where(lower,1, 0)
+        colors = pd.Series(indicator).map(colors)
+        return colors.values
+
+    if diff_mode:
+        style.apply(diff_colors, axis=1)
     return style
+
+from collections import namedtuple
+
+JinjaBalance = namedtuple('JinjaBalance', ['data', 'html'])
+
+def table_to_html_for_jinja(
+    data, config, freq, start, end, diff_mode=False):
+    frame, config, is_today, predicted = reshape_to_balance_table(
+        data,
+        config,
+        start,
+        end,
+        freq
+    )
+    style = __table_to_html(config, frame, is_today, predicted, diff_mode)
+    styled = style.to_html()
+    # Define the hierarchy graph for user interation
+    hierarchy = pandas_dep_graph(config)
+    parents = pandas_parent_graph(config)
+    return JinjaBalance(
+        frame, render_jinja_html(
+        "table.html",
+        table=styled,
+        hierarchy=hierarchy,
+        parents=parents,
+        dims=frame.shape,
+    ))
+
+
+def _table_to_html(
+    data, config, table_id, freq, start, end):
+    frame, config, is_today, predicted = reshape_to_balance_table(
+        data,
+        config.xs(table_id),
+        start,
+        end,
+        freq
+    )
+    style = __table_to_html(config, frame, is_today, predicted)
+    styled = style.to_html()
+    # Define the hierarchy graph for user interation
+    hierarchy = pandas_dep_graph(config)
+    parents = pandas_parent_graph(config)
+    return render_template(
+        "table.html",
+        table=styled,
+        hierarchy=hierarchy,
+        parents=parents,
+        dims=frame.shape,
+    )
 
 
 @balance_table.route('/table/<table_id>/<freq>/<start>/<end>')
 def table_to_html(table_id, freq, start, end):
-    frame, config, is_today, predicted = reshape_to_balance_table(
+    flasky = _table_to_html(
         balance_table.data,
-        balance_table.CONFIG.xs(table_id),
+        balance_table.CONFIG,
+        table_id,
+        freq,
         start,
-        end,
-        freq
+        end
     )
-    style = _table_to_html(config, frame, is_today, predicted)
-    styled = style.to_html()
-    # Define the hierarchy graph for user interation
-    hierarchy = pandas_dep_graph(config)
-    parents = pandas_parent_graph(config)
-    return render_template(
-        "table.html",
-        table=styled,
-        hierarchy=hierarchy,
-        parents=parents,
-        dims=frame.shape,
-    )
-
-
-@balance_table.route('/dtable/<table_id>/<freq>/<start>/<end>')
-def dtable_to_html(table_id, freq, start, end):
-    frame, config, is_today, predicted = reshape_to_balance_table(
-        balance_table.datas,
-        balance_table.CONFIG.xs(table_id),
-        start,
-        end,
-        freq
-    )
-    style = _table_to_html(config, frame, is_today, predicted)
-    style.text_gradient(cmap='RdYlGn', axis=0)
-    styled = style.to_html()
-    # Define the hierarchy graph for user interation
-    hierarchy = pandas_dep_graph(config)
-    parents = pandas_parent_graph(config)
-    return render_template(
-        "table.html",
-        table=styled,
-        hierarchy=hierarchy,
-        parents=parents,
-        dims=frame.shape,
-    )
+    return flasky

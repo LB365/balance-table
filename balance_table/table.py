@@ -1,6 +1,6 @@
 import pandas as pd
-from balance_table.moment import evaluate_not_none
-from balance_table.dep_graph import find_dep_graph
+from moments import evaluate_not_none
+from balances.dep_graph import find_dep_graph
 
 PRETTY_DATES = {
     'MS': '%b-%y',
@@ -56,6 +56,7 @@ def pandas_dep_graph(config):
     }
     return deps
 
+
 def pandas_parent_graph(config):
     _config = config.reset_index().reset_index()
     dependants = _extract_by_series_id(_config, 'parent', 'series_id')
@@ -67,6 +68,7 @@ def pandas_parent_graph(config):
         for k, v in parents.items()
     }
     return pars
+
 
 def pandas_dep_graph(config):
     _config = config.reset_index().reset_index()
@@ -80,6 +82,7 @@ def pandas_dep_graph(config):
         for k, v in graph.items()
     }
     return deps
+
 
 def _extract_by_series_id(config, dim, key='series_id'):
     return config[[key, dim]].set_index(key)[dim].to_dict()
@@ -113,7 +116,7 @@ def compute_nodes(data, config):
     ]
     for s in data:
         if s in coefs:
-            data[s] *= coefs[s] 
+            data[s] *= coefs[s]
     for parent in _series:
         child_series = config[config.parent == parent]['series_id'].values
         agg_operation = config[config.series_id ==

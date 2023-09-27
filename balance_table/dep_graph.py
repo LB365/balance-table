@@ -14,10 +14,10 @@ def find_parents(x, input_data):
 def find_dep_graph(dependency_graph):
     output_parents = {i: find_parents(i, dependency_graph)
                       for i in dependency_graph}
-    output_childrens = {k: [] for k in dependency_graph.keys()}
+    output_children = {k: [] for k in dependency_graph.keys()}
     for x in dependency_graph:
         for child, parents in output_parents.items():
             for parent in parents:
                 if x == parent:
-                    output_childrens[x].append(child)
-    return dict(filter(lambda v: v[1], output_childrens.items()))
+                    output_children[x].append(child)
+    return dict(filter(lambda v: v[1], output_children.items()))
